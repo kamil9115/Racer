@@ -14,10 +14,12 @@ import java.util.List;
 @Transactional
 public class PojazdService {
     private PojazdRepository pojazdRepository;
+    private PojazdyUzytkownikaService pojazdyUzytkownikaService;
 
     @Autowired
-    public PojazdService(PojazdRepository pojazdRepository){
+    public PojazdService(PojazdRepository pojazdRepository, PojazdyUzytkownikaService pojazdyUzytkownikaService){
         this.pojazdRepository = pojazdRepository;
+        this.pojazdyUzytkownikaService = pojazdyUzytkownikaService;
     }
 
     public ResponseEntity<List<Pojazd>> getPojazd() {
@@ -34,10 +36,10 @@ public class PojazdService {
         }
     }
 
-    public ResponseEntity addPojazd(String marka,String model,String typ,int pojemnosc,float moc){
+    public ResponseEntity<Pojazd> addPojazd(String marka,String model,String typ,int pojemnosc,float moc){
         Pojazd pojazd = new Pojazd(marka,model,typ,pojemnosc,moc);
         pojazdRepository.saveAndFlush(pojazd);
-        return new ResponseEntity(HttpStatus.CREATED);
+        return ResponseEntity.ok(pojazd);
     }
 
     public ResponseEntity<List<Pojazd>> getPojazdById(Long id){
@@ -180,10 +182,63 @@ public class PojazdService {
         }
     }
 
-    public ResponseEntity deletePojazd(Long id){
-        if(pojazdRepository.exists(id)){
+    public ResponseEntity<Pojazd> deletePojazd(Long id){
+        List<Pojazd> pojazd = pojazdRepository.findById(id);
+        if(pojazd != null && pojazd.size() > 0){
+            pojazdyUzytkownikaService.deletePojazdyUzytkownikaByPojazdId(id);
             pojazdRepository.delete(id);
-            return new ResponseEntity(HttpStatus.OK);
+            return ResponseEntity.ok(pojazd.get(0));
+        }else{
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }
+    }
+
+    public ResponseEntity<List<String>> getMarka(){
+        List<String> list = null;
+        list = pojazdRepository.findMarka();
+        if(list != null){
+            if(list.size() > 0) {
+                return ResponseEntity.ok(list);
+            }else{
+                return new ResponseEntity(HttpStatus.NO_CONTENT);
+            }
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    public ResponseEntity<List<String>> getMarkaByTyp(String typ){
+        List<String> list = null;
+        list = pojazdRepository.findMarkaByTyp(typ);
+        if(list != null){
+            if(list.size() > 0) {
+                return ResponseEntity.ok(list);
+            }else{
+                return new ResponseEntity(HttpStatus.NO_CONTENT);
+            }
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    public ResponseEntity<List<String>> getModelByMarka(String marka){
+        List<String> list = null;
+        list = pojazdRepository.findModelByMarka(marka);
+        if(list != null){
+            if(list.size() > 0) {
+                return ResponseEntity.ok(list);
+            }else{
+                return new ResponseEntity(HttpStatus.NO_CONTENT);
+            }
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    public ResponseEntity<Pojazd> updatePojazd(Pojazd pojazd){
+        if(pojazdRepository.exists(pojazd.getId())){
+            pojazdRepository.save(pojazd);
+            return ResponseEntity.ok(pojazd);
         }else{
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }

@@ -3,10 +3,7 @@ package pl.edu.wat.wcy.tim.racer.api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.edu.wat.wcy.tim.racer.core.TrasaService;
 import pl.edu.wat.wcy.tim.racer.domain.Trasa;
 
@@ -32,8 +29,8 @@ public class TrasaRestController {
     }
 
     @RequestMapping(value = "/trasa", method = RequestMethod.POST)
-    public ResponseEntity addTrasa(@RequestParam("uzytkownikId") Long uzytkownikId, @RequestParam("nazwa") String nazwa, @RequestParam("opis") String opis) {
-        ResponseEntity response = trasaService.addTrasa(uzytkownikId,nazwa,opis);
+    public ResponseEntity<Trasa> addTrasa(@RequestParam("uzytkownikId") Long uzytkownikId, @RequestParam("nazwa") String nazwa, @RequestParam("opis") String opis) {
+        ResponseEntity<Trasa> response = trasaService.addTrasa(uzytkownikId,nazwa,opis);
         if(response != null){
             return response;
         }else{
@@ -92,8 +89,18 @@ public class TrasaRestController {
     }
 
     @RequestMapping(value = "/trasa", method = RequestMethod.DELETE)
-    public ResponseEntity deleteTrasa(@RequestParam("id") Long id) {
-        ResponseEntity response = trasaService.deleteTrasa(id);
+    public ResponseEntity<Trasa> deleteTrasa(@RequestParam("id") Long id) {
+        ResponseEntity<Trasa> response = trasaService.deleteTrasa(id);
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    @RequestMapping(value = "/trasa", method = RequestMethod.PUT)
+    public ResponseEntity<Trasa> updateTrasa(@RequestBody Trasa trasa){
+        ResponseEntity<Trasa> response = trasaService.updateTrasa(trasa);
         if(response != null){
             return response;
         }else{

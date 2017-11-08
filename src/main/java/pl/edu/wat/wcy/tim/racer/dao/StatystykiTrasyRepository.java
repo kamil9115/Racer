@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.edu.wat.wcy.tim.racer.domain.PojazdyUzytkownika;
 import pl.edu.wat.wcy.tim.racer.domain.StatystykiTrasy;
 import pl.edu.wat.wcy.tim.racer.domain.Trasa;
+import pl.edu.wat.wcy.tim.racer.domain.idClass.PojazdyUzytkownikaId;
 import pl.edu.wat.wcy.tim.racer.domain.idClass.StatystykiTrasyId;
 
 import java.util.List;
@@ -20,4 +21,7 @@ public interface StatystykiTrasyRepository extends JpaRepository<StatystykiTrasy
     @Modifying
     @Transactional
     void deleteByTrasaId(Trasa trasaId);
+    @Modifying
+    @Transactional
+    void deleteByPojazdyUzytkownikaId(PojazdyUzytkownika pojazdyUzytkownikaId);
 }

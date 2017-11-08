@@ -7,7 +7,7 @@ var app = angular.module('app', []);
 app.controller('controller', function($scope, $http) {
 
     $scope.getUzytkownik = function() {
-        $http.get("/Racer-1.0/uzytkownik")
+        $http.get("http://racer-tim.azurewebsites.net/uzytkownik")
             .then(function(response) {
                 $scope.uzytkownikList = response.data;
             });
@@ -16,14 +16,14 @@ app.controller('controller', function($scope, $http) {
     $scope.getUzytkownik();
 
     $scope.getUzytkownikByNazwa = function() {
-        $http.get("/Racer-1.0/uzytkownik/nazwa?nazwa="+$scope.findUzytkownik.nazwa)
+        $http.get("http://racer-tim.azurewebsites.net/uzytkownik/nazwa?nazwa="+$scope.findUzytkownik.nazwa)
             .then(function(response) {
                 $scope.uzytkownikList = response.data;
             });
     }
 
     $scope.getUzytkownikById = function() {
-        $http.get("/Racer-1.0/uzytkownik/id?id="+$scope.findUzytkownik.id)
+        $http.get("http://racer-tim.azurewebsites.net/uzytkownik/id?id="+$scope.findUzytkownik.id)
             .then(function(response) {
                 $scope.uzytkownikList = response.data;
             });
@@ -43,7 +43,7 @@ app.controller('controller', function($scope, $http) {
     }
 
     $scope.deleteUzytkownik = function(id) {
-        $http.delete("/Racer-1.0/uzytkownik?id="+id)
+        $http.delete("http://racer-tim.azurewebsites.net/uzytkownik?id="+id)
             .then(function() {
                 //removeFromList($scope.uzytkownikList, id);
                 $scope.getUzytkownik();
@@ -54,7 +54,7 @@ app.controller('controller', function($scope, $http) {
     }
 
     $scope.addUzytkownik = function() {
-        $http.post("/Racer-1.0/uzytkownik?nazwa="+$scope.newUzytkownik.nazwa+"&haslo="+$scope.newUzytkownik.haslo)
+        $http.post("http://racer-tim.azurewebsites.net/uzytkownik?nazwa="+$scope.newUzytkownik.nazwa+"&haslo="+$scope.newUzytkownik.haslo)
             .then(function() {
                 alert("yea");
                 $scope.newUzytkownik = "";

@@ -44,7 +44,7 @@ public class CzasNaTrasieService {
         }
     }
 
-    public ResponseEntity addCzasNaTrasie(int nrPunktu,Long trasaId,int nrPojazdu, Long uzytkownikId, Time czas){
+    public ResponseEntity<CzasNaTrasie> addCzasNaTrasie(int nrPunktu,Long trasaId,int nrPojazdu, Long uzytkownikId, Time czas){
         List<Uzytkownik> uzytkownik = uzytkownikRepository.findById(uzytkownikId);
         if(uzytkownik != null) {
             if(uzytkownik.size() > 0) {
@@ -59,7 +59,7 @@ public class CzasNaTrasieService {
                                     if (punktyTrasy.size() > 0) {
                                         CzasNaTrasie czasNaTrasie = new CzasNaTrasie(punktyTrasy.get(0),pojazdyUzytk.get(0),czas);
                                         czasNaTrasieRepository.saveAndFlush(czasNaTrasie);
-                                        return new ResponseEntity(HttpStatus.CREATED);
+                                        return ResponseEntity.ok(czasNaTrasie);
                                     } else {
                                         return new ResponseEntity(HttpStatus.NO_CONTENT);
                                     }
@@ -205,7 +205,7 @@ public class CzasNaTrasieService {
         }
     }
 
-    public ResponseEntity deleteCzasNaTrasie(int nrPunktu,Long trasaId,int nrPojazdu, Long uzytkownikId){
+    public ResponseEntity<CzasNaTrasie> deleteCzasNaTrasie(int nrPunktu,Long trasaId,int nrPojazdu, Long uzytkownikId){
         List<Uzytkownik> uzytkownik = uzytkownikRepository.findById(uzytkownikId);
         if(uzytkownik != null) {
             if(uzytkownik.size() > 0) {
@@ -218,9 +218,10 @@ public class CzasNaTrasieService {
                                 List<PunktyTrasy> punktyTrasy = punktyTrasyRepository.findByNrAndTrasaId(nrPunktu,trasa.get(0));
                                 if (punktyTrasy != null) {
                                     if (punktyTrasy.size() > 0) {
-                                        if (czasNaTrasieRepository.findByPunktyTrasyIdAndPojazdyUzytkownikaId(punktyTrasy.get(0),pojazdyUzytk.get(0)).size() > 0) {
+                                        List<CzasNaTrasie> czasNaTrasie = czasNaTrasieRepository.findByPunktyTrasyIdAndPojazdyUzytkownikaId(punktyTrasy.get(0),pojazdyUzytk.get(0));
+                                        if (czasNaTrasie != null && czasNaTrasie.size() > 0) {
                                             czasNaTrasieRepository.delete(new CzasNaTrasieId(new PunktyTrasyId(nrPunktu,trasa.get(0).getId()),new PojazdyUzytkownikaId(nrPojazdu,uzytkownik.get(0).getId())));
-                                            return new ResponseEntity(HttpStatus.OK);
+                                            return ResponseEntity.ok(czasNaTrasie.get(0));
                                         } else {
                                             return new ResponseEntity(HttpStatus.NO_CONTENT);
                                         }
@@ -250,16 +251,17 @@ public class CzasNaTrasieService {
         }
     }
 
-    public ResponseEntity deleteCzasNaTrasieByPunktyTrasyId(int nrPunktu,Long trasaId){
+    public ResponseEntity<List<CzasNaTrasie>> deleteCzasNaTrasieByPunktyTrasyId(int nrPunktu,Long trasaId){
         List<Trasa> trasa = trasaRepository.findById(trasaId);
         if (trasa != null) {
             if (trasa.size() > 0) {
                 List<PunktyTrasy> punktyTrasy = punktyTrasyRepository.findByNrAndTrasaId(nrPunktu,trasa.get(0));
                 if (punktyTrasy != null) {
                     if (punktyTrasy.size() > 0) {
-                        if (czasNaTrasieRepository.findByPunktyTrasyId(punktyTrasy.get(0)).size() > 0) {
+                        List<CzasNaTrasie> czasNaTrasie = czasNaTrasieRepository.findByPunktyTrasyId(punktyTrasy.get(0));
+                        if (czasNaTrasie != null && czasNaTrasie.size() > 0) {
                             czasNaTrasieRepository.deleteByPunktyTrasyId(punktyTrasy.get(0));
-                            return new ResponseEntity(HttpStatus.OK);
+                            return ResponseEntity.ok(czasNaTrasie);
                         } else {
                             return new ResponseEntity(HttpStatus.NO_CONTENT);
                         }
@@ -277,16 +279,17 @@ public class CzasNaTrasieService {
         }
     }
 
-    public ResponseEntity deleteCzasNaTrasieByPojazdyUzytkownikaId(int nrPojazdu, Long uzytkownikId){
+    public ResponseEntity<List<CzasNaTrasie>> deleteCzasNaTrasieByPojazdyUzytkownikaId(int nrPojazdu, Long uzytkownikId){
         List<Uzytkownik> uzytkownik = uzytkownikRepository.findById(uzytkownikId);
         if(uzytkownik != null) {
             if(uzytkownik.size() > 0) {
                 List<PojazdyUzytkownika> pojazdyUzytk = pojazdyUzytkownikaRepository.findByNrAndUzytkownikId(nrPojazdu,uzytkownik.get(0));
                 if(pojazdyUzytk != null) {
                     if (pojazdyUzytk.size() > 0) {
-                        if (czasNaTrasieRepository.findByPojazdyUzytkownikaId(pojazdyUzytk.get(0)).size() > 0) {
+                        List<CzasNaTrasie> czasNaTrasie = czasNaTrasieRepository.findByPojazdyUzytkownikaId(pojazdyUzytk.get(0));
+                        if (czasNaTrasie != null && czasNaTrasie.size() > 0) {
                             czasNaTrasieRepository.deleteByPojazdyUzytkownikaId(pojazdyUzytk.get(0));
-                            return new ResponseEntity(HttpStatus.OK);
+                            return ResponseEntity.ok(czasNaTrasie);
                         } else {
                             return new ResponseEntity(HttpStatus.NO_CONTENT);
                         }
@@ -301,6 +304,15 @@ public class CzasNaTrasieService {
             }
         }else{
             return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    public ResponseEntity<CzasNaTrasie> updateCzasNaTrasie(CzasNaTrasie czasNaTrasie){
+        if(czasNaTrasieRepository.exists(new CzasNaTrasieId(new PunktyTrasyId(czasNaTrasie.getPunktyTrasyId().getNr(),czasNaTrasie.getPunktyTrasyId().getTrasaId().getId()),new PojazdyUzytkownikaId(czasNaTrasie.getPojazdyUzytkownikaId().getNr(),czasNaTrasie.getPojazdyUzytkownikaId().getUzytkownikId().getId())))){
+            czasNaTrasieRepository.save(czasNaTrasie);
+            return ResponseEntity.ok(czasNaTrasie);
+        }else{
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
     }
 }

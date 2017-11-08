@@ -19,4 +19,7 @@ public interface PojazdyUzytkownikaRepository extends JpaRepository<PojazdyUzytk
     @Modifying
     @Transactional
     void deleteByUzytkownikId(Uzytkownik uzytkownikId);
+    @Modifying
+    @Transactional
+    void deleteByPojazdId(Pojazd pojazd);
 }

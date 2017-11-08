@@ -3,10 +3,7 @@ package pl.edu.wat.wcy.tim.racer.api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.edu.wat.wcy.tim.racer.core.StatystykiTrasyService;
 import pl.edu.wat.wcy.tim.racer.domain.StatystykiTrasy;
 
@@ -33,8 +30,8 @@ public class StatystykiTrasyRestController {
     }
 
     @RequestMapping(value = "/statystyki_trasy", method = RequestMethod.POST)
-    public ResponseEntity addStatystykiTrasy(@RequestParam("nrPojazdu") int nrPojazdu, @RequestParam("uzytkownikId") Long uzytkownikId, @RequestParam("trasaId") Long trasaId, @RequestParam("czas")Time czas,@RequestParam("vMax")int vMax,@RequestParam("vAvg")int vAvg,@RequestParam("czas_0_100")Time czas_0_100,@RequestParam("czas_0_vmax")Time czas_0_vmax,@RequestParam("ocena")int ocena) {
-        ResponseEntity response = statystykiTrasyService.addStatystykiTrasy(nrPojazdu,uzytkownikId,trasaId,czas,vMax,vAvg,czas_0_100,czas_0_vmax,ocena);
+    public ResponseEntity<StatystykiTrasy> addStatystykiTrasy(@RequestParam("nrPojazdu") int nrPojazdu, @RequestParam("uzytkownikId") Long uzytkownikId, @RequestParam("trasaId") Long trasaId, @RequestParam("czas")Time czas,@RequestParam("vMax")int vMax,@RequestParam("vAvg")int vAvg,@RequestParam("czas_0_100")Time czas_0_100,@RequestParam("czas_0_vmax")Time czas_0_vmax,@RequestParam("ocena")int ocena) {
+        ResponseEntity<StatystykiTrasy> response = statystykiTrasyService.addStatystykiTrasy(nrPojazdu,uzytkownikId,trasaId,czas,vMax,vAvg,czas_0_100,czas_0_vmax,ocena);
         if(response != null){
             return response;
         }else{
@@ -73,7 +70,7 @@ public class StatystykiTrasyRestController {
     }
 
     @RequestMapping(value = "/statystyki_trasy/ocena", method = RequestMethod.GET)
-    public ResponseEntity<List<StatystykiTrasy>> getStatystykiTrasyByOcena(@RequestParam("min") int min, @RequestParam("max") int max) {
+    public ResponseEntity<List<StatystykiTrasy>> getStatystykiTrasyByOcenaBetween(@RequestParam("min") int min, @RequestParam("max") int max) {
         ResponseEntity<List<StatystykiTrasy>> response = statystykiTrasyService.getStatystykiTrasyByOcenaBetween(min,max);
         if(response != null){
             return response;
@@ -83,8 +80,8 @@ public class StatystykiTrasyRestController {
     }
 
     @RequestMapping(value = "/statystyki_trasy", method = RequestMethod.DELETE)
-    public ResponseEntity deleteStatystykiTrasy(@RequestParam("nrPojazdu") int nrPojazdu,@RequestParam("uzytkownikId") Long uzytkownikId,@RequestParam("trasaId") Long trasaId) {
-        ResponseEntity response = statystykiTrasyService.deleteStatystykiTrasy(trasaId,nrPojazdu,uzytkownikId);
+    public ResponseEntity<StatystykiTrasy> deleteStatystykiTrasy(@RequestParam("nrPojazdu") int nrPojazdu,@RequestParam("uzytkownikId") Long uzytkownikId,@RequestParam("trasaId") Long trasaId) {
+        ResponseEntity<StatystykiTrasy> response = statystykiTrasyService.deleteStatystykiTrasy(trasaId,nrPojazdu,uzytkownikId);
         if(response != null){
             return response;
         }else{
@@ -93,8 +90,28 @@ public class StatystykiTrasyRestController {
     }
 
     @RequestMapping(value = "/statystyki_trasy/trasaId", method = RequestMethod.DELETE)
-    public ResponseEntity deleteStatystykiTrasy(@RequestParam("trasaId") Long trasaId) {
-        ResponseEntity response = statystykiTrasyService.deleteStatystykiTrasyByTrasaId(trasaId);
+    public ResponseEntity<List<StatystykiTrasy>> deleteStatystykiTrasy(@RequestParam("trasaId") Long trasaId) {
+        ResponseEntity<List<StatystykiTrasy>> response = statystykiTrasyService.deleteStatystykiTrasyByTrasaId(trasaId);
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    @RequestMapping(value = "/statystyki_trasy/pojazdyUzytkownikaId", method = RequestMethod.DELETE)
+    public ResponseEntity<List<StatystykiTrasy>> deleteStatystykiTrasy(@RequestParam("nr") int nr,@RequestParam("uzytkownikId") Long uzytkownikId) {
+        ResponseEntity<List<StatystykiTrasy>> response = statystykiTrasyService.deleteStatystykiTrasyByPojazdyUzytkownikaId(nr,uzytkownikId);
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    @RequestMapping(value = "/statystyki_trasy", method = RequestMethod.PUT)
+    public ResponseEntity<StatystykiTrasy> updateStatystykiTrasy(@RequestBody StatystykiTrasy statystykiTrasy){
+        ResponseEntity<StatystykiTrasy> response = statystykiTrasyService.updateStatystykiTrasy(statystykiTrasy);
         if(response != null){
             return response;
         }else{

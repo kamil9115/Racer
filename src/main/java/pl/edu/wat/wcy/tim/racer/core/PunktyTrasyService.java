@@ -18,11 +18,13 @@ import java.util.List;
 public class PunktyTrasyService {
     private PunktyTrasyRepository punktyTrasyRepository;
     private TrasaRepository trasaRepository;
+    private CzasNaTrasieService czasNaTrasieService;
 
     @Autowired
-    public PunktyTrasyService(PunktyTrasyRepository punktyTrasyRepository,TrasaRepository trasaRepository){
+    public PunktyTrasyService(PunktyTrasyRepository punktyTrasyRepository,TrasaRepository trasaRepository, CzasNaTrasieService czasNaTrasieService){
         this.punktyTrasyRepository = punktyTrasyRepository;
         this.trasaRepository = trasaRepository;
+        this.czasNaTrasieService = czasNaTrasieService;
     }
 
     public ResponseEntity<List<PunktyTrasy>> getPunktyTrasy(){
@@ -39,15 +41,29 @@ public class PunktyTrasyService {
         }
     }
 
-    public ResponseEntity addPunktyTrasy(Long trasaId,double szer,double dlug){
+    public ResponseEntity<PunktyTrasy> addPunktyTrasy(Long trasaId,double szer,double dlug){
         List<Trasa> trasa = trasaRepository.findById(trasaId);
 
         if(trasa != null) {
             if(trasa.size() > 0) {
-                int nr = punktyTrasyRepository.countByTrasaId(trasa.get(0));
-                PunktyTrasy punktyTrasy = new PunktyTrasy(nr,trasa.get(0),szer,dlug);
-                punktyTrasyRepository.saveAndFlush(punktyTrasy);
-                return new ResponseEntity(HttpStatus.CREATED);
+                int nr = 0;
+                List<PunktyTrasy> punkty = punktyTrasyRepository.findByTrasaId(trasa.get(0));
+                if(punkty != null){
+                    if(punkty.size() > 0){
+                        nr = punkty.get(0).getNr();
+                        for(int i=1;i<punkty.size();i++){
+                            if(nr < punkty.get(i).getNr()){
+                                nr = punkty.get(i).getNr();
+                            }
+                        }
+                        nr++;
+                    }
+                    PunktyTrasy punktyTrasy = new PunktyTrasy(nr,trasa.get(0),szer,dlug);
+                    punktyTrasyRepository.saveAndFlush(punktyTrasy);
+                    return ResponseEntity.ok(punktyTrasy);
+                }else{
+                    return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+                }
             }else{
                 return new ResponseEntity(HttpStatus.NO_CONTENT);
             }
@@ -109,14 +125,15 @@ public class PunktyTrasyService {
         }
     }
 
-    public ResponseEntity deletePunktyTrasy(int nr,Long trasaId){
+    public ResponseEntity<PunktyTrasy> deletePunktyTrasy(int nr,Long trasaId){
         List<Trasa> trasa = trasaRepository.findById(trasaId);
         if(trasa != null) {
             if(trasa.size() > 0) {
-                if (punktyTrasyRepository.findByNrAndTrasaId(nr, trasa.get(0)).size() > 0) {
-                    //punktyTrasyRepository.deleteByNrAndTrasaId(nr,trasa.get(0));
+                List<PunktyTrasy> punktyTrasy = punktyTrasyRepository.findByNrAndTrasaId(nr, trasa.get(0));
+                if (punktyTrasy != null && punktyTrasy.size() > 0) {
+                    czasNaTrasieService.deleteCzasNaTrasieByPunktyTrasyId(nr,trasaId);
                     punktyTrasyRepository.delete(new PunktyTrasyId(nr,trasa.get(0).getId()));
-                    return new ResponseEntity(HttpStatus.OK);
+                    return ResponseEntity.ok(punktyTrasy.get(0));
                 } else {
                     return new ResponseEntity(HttpStatus.NO_CONTENT);
                 }
@@ -128,13 +145,17 @@ public class PunktyTrasyService {
         }
     }
 
-    public ResponseEntity deletePunktyTrasyByTrasaId(Long trasaId){
+    public ResponseEntity<List<PunktyTrasy>> deletePunktyTrasyByTrasaId(Long trasaId){
         List<Trasa> trasa = trasaRepository.findById(trasaId);
         if(trasa != null) {
             if(trasa.size() > 0) {
-                if (punktyTrasyRepository.findByTrasaId(trasa.get(0)).size() > 0) {
+                List<PunktyTrasy> punktyTrasy = punktyTrasyRepository.findByTrasaId(trasa.get(0));
+                if (punktyTrasy != null && punktyTrasy.size() > 0) {
+                    for(int i=0;i<punktyTrasy.size();i++){
+                        czasNaTrasieService.deleteCzasNaTrasieByPunktyTrasyId(punktyTrasy.get(i).getNr(),trasaId);
+                    }
                     punktyTrasyRepository.deleteByTrasaId(trasa.get(0));
-                    return new ResponseEntity(HttpStatus.OK);
+                    return ResponseEntity.ok(punktyTrasy);
                 } else {
                     return new ResponseEntity(HttpStatus.NO_CONTENT);
                 }
@@ -146,4 +167,12 @@ public class PunktyTrasyService {
         }
     }
 
+    public ResponseEntity<PunktyTrasy> updatePunktyTrasy(PunktyTrasy punktyTrasy){
+        if(punktyTrasyRepository.exists(new PunktyTrasyId(punktyTrasy.getNr(),punktyTrasy.getTrasaId().getId()))){
+            punktyTrasyRepository.save(punktyTrasy);
+            return ResponseEntity.ok(punktyTrasy);
+        }else{
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }
+    }
 }

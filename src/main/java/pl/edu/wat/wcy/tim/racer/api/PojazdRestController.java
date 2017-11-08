@@ -1,12 +1,10 @@
 package pl.edu.wat.wcy.tim.racer.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.edu.wat.wcy.tim.racer.core.PojazdService;
 import pl.edu.wat.wcy.tim.racer.domain.Pojazd;
 
@@ -32,8 +30,8 @@ public class PojazdRestController {
     }
 
     @RequestMapping(value = "/pojazd", method = RequestMethod.POST)
-    public ResponseEntity addPojazd(@RequestParam("marka") String marka, @RequestParam("model") String model,@RequestParam("typ") String typ,@RequestParam("pojemnosc") int pojemnosc,@RequestParam("moc") float moc) {
-        ResponseEntity response = pojazdService.addPojazd(marka,model,typ,pojemnosc,moc);
+    public ResponseEntity<Pojazd> addPojazd(@RequestParam("marka") String marka, @RequestParam("model") String model,@RequestParam("typ") String typ,@RequestParam("pojemnosc") int pojemnosc,@RequestParam("moc") float moc) {
+        ResponseEntity<Pojazd> response = pojazdService.addPojazd(marka,model,typ,pojemnosc,moc);
         if(response != null){
             return response;
         }else{
@@ -142,8 +140,48 @@ public class PojazdRestController {
     }
 
     @RequestMapping(value = "/pojazd", method = RequestMethod.DELETE)
-    public ResponseEntity deletePojazd(@RequestParam("id") Long id) {
-        ResponseEntity response = pojazdService.deletePojazd(id);
+    public ResponseEntity<Pojazd> deletePojazd(@RequestParam("id") Long id) {
+        ResponseEntity<Pojazd> response = pojazdService.deletePojazd(id);
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    @RequestMapping(value = "/pojazd/getMarka",method = RequestMethod.GET)
+    public ResponseEntity<List<String>> getMarka(){
+        ResponseEntity<List<String>> response = pojazdService.getMarka();
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    @RequestMapping(value = "/pojazd/getMarkaByTyp",method = RequestMethod.GET)
+    public ResponseEntity<List<String>> getMarkaByTyp(@RequestParam("typ") String typ){
+        ResponseEntity<List<String>> response = pojazdService.getMarkaByTyp(typ);
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    @RequestMapping(value = "/pojazd/getModel",method = RequestMethod.GET)
+    public ResponseEntity<List<String>> getModelByMarka(@RequestParam("marka") String marka){
+        ResponseEntity<List<String>> response = pojazdService.getModelByMarka(marka);
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    @RequestMapping(value = "/pojazd", method = RequestMethod.PUT)
+    public ResponseEntity<Pojazd> updatePojazd(@RequestBody Pojazd pojazd){
+        ResponseEntity<Pojazd> response = pojazdService.updatePojazd(pojazd);
         if(response != null){
             return response;
         }else{

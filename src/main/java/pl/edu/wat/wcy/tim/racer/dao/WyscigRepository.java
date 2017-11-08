@@ -1,7 +1,9 @@
 package pl.edu.wat.wcy.tim.racer.dao;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import pl.edu.wat.wcy.tim.racer.domain.Trasa;
 import pl.edu.wat.wcy.tim.racer.domain.Uzytkownik;
 import pl.edu.wat.wcy.tim.racer.domain.Wyscig;
@@ -18,4 +20,7 @@ public interface WyscigRepository extends JpaRepository<Wyscig,Long>{
     List<Wyscig> findByTyp(String typ);
     List<Wyscig> findByDataBetween(Date min,Date max);
     List<Wyscig> findByNazwaContainsIgnoreCase(String nazwa);
+    @Modifying
+    @Transactional
+    void deleteByTrasaId(Trasa trasaId);
 }

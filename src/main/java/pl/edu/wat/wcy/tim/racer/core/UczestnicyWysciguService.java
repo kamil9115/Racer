@@ -43,17 +43,31 @@ public class UczestnicyWysciguService {
         }
     }
 
-    public ResponseEntity addUczestnicyWyscigu(Long uzytkownikId,Long wyscigId){
+    public ResponseEntity<UczestnicyWyscigu> addUczestnicyWyscigu(Long uzytkownikId,Long wyscigId){
         List<Uzytkownik> uzytkownik = uzytkownikRepository.findById(uzytkownikId);
         if(uzytkownik != null) {
             if(uzytkownik.size() > 0) {
                 List<Wyscig> wyscig = wyscigRepository.findById(wyscigId);
                 if(wyscig != null){
                     if(wyscig.size() > 0){
-                        int nr = uczestnicyWysciguRepository.countByWyscigId(wyscig.get(0));
-                        UczestnicyWyscigu uczestnicyWyscigu = new UczestnicyWyscigu(nr,wyscig.get(0),uzytkownik.get(0),false,0);
-                        uczestnicyWysciguRepository.saveAndFlush(uczestnicyWyscigu);
-                        return new ResponseEntity(HttpStatus.CREATED);
+                        int nr = 0;
+                        List<UczestnicyWyscigu> uczestnicy = uczestnicyWysciguRepository.findByWyscigId(wyscig.get(0));
+                        if(uczestnicy != null) {
+                            if (uczestnicy.size() > 0) {
+                                nr = uczestnicy.get(0).getNr();
+                                for (int i = 1; i < uczestnicy.size(); i++) {
+                                    if (nr < uczestnicy.get(i).getNr()) {
+                                        nr = uczestnicy.get(i).getNr();
+                                    }
+                                }
+                                nr++;
+                            }
+                            UczestnicyWyscigu uczestnicyWyscigu = new UczestnicyWyscigu(nr,wyscig.get(0),uzytkownik.get(0),false,0);
+                            uczestnicyWysciguRepository.saveAndFlush(uczestnicyWyscigu);
+                            return ResponseEntity.ok(uczestnicyWyscigu);
+                        }else{
+                            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+                        }
                     }else{
                         return new ResponseEntity(HttpStatus.NO_CONTENT);
                     }
@@ -193,13 +207,14 @@ public class UczestnicyWysciguService {
         }
     }
 
-    public ResponseEntity deleteUczestnicyWyscigu(int nr,Long wyscigId){
+    public ResponseEntity<UczestnicyWyscigu> deleteUczestnicyWyscigu(int nr,Long wyscigId){
         List<Wyscig> wyscig = wyscigRepository.findById(wyscigId);
         if(wyscig != null) {
             if(wyscig.size() > 0) {
-                if (uczestnicyWysciguRepository.findByNrAndWyscigId(nr, wyscig.get(0)).size() > 0) {
+                List<UczestnicyWyscigu> uczestnicyWyscigu = uczestnicyWysciguRepository.findByNrAndWyscigId(nr, wyscig.get(0));
+                if (uczestnicyWyscigu != null && uczestnicyWyscigu.size() > 0) {
                     uczestnicyWysciguRepository.delete(new UczestnicyWysciguId(nr,wyscig.get(0).getId()));
-                    return new ResponseEntity(HttpStatus.OK);
+                    return ResponseEntity.ok(uczestnicyWyscigu.get(0));
                 } else {
                     return new ResponseEntity(HttpStatus.NO_CONTENT);
                 }
@@ -211,13 +226,14 @@ public class UczestnicyWysciguService {
         }
     }
 
-    public ResponseEntity deleteUczestnicyWysciguByWyscigId(Long wyscigId){
+    public ResponseEntity<UczestnicyWyscigu> deleteUczestnicyWysciguByWyscigId(Long wyscigId){
         List<Wyscig> wyscig = wyscigRepository.findById(wyscigId);
         if(wyscig != null) {
             if(wyscig.size() > 0) {
-                if (uczestnicyWysciguRepository.findByWyscigId(wyscig.get(0)).size() > 0) {
+                List<UczestnicyWyscigu> uczestnicyWyscigu = uczestnicyWysciguRepository.findByWyscigId(wyscig.get(0));
+                if (uczestnicyWyscigu != null && uczestnicyWyscigu.size() > 0) {
                     uczestnicyWysciguRepository.deleteByWyscigId(wyscig.get(0));
-                    return new ResponseEntity(HttpStatus.OK);
+                    return ResponseEntity.ok(uczestnicyWyscigu.get(0));
                 } else {
                     return new ResponseEntity(HttpStatus.NO_CONTENT);
                 }
@@ -226,6 +242,38 @@ public class UczestnicyWysciguService {
             }
         }else{
             return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    public ResponseEntity<List<UczestnicyWyscigu>> deleteUczestnicyWysciguByUzytkownikId(Long uzytkownikId){
+        List<Uzytkownik> uzytkownik = uzytkownikRepository.findById(uzytkownikId);
+        if(uzytkownik != null){
+            if(uzytkownik.size() > 0){
+                List<UczestnicyWyscigu> uczestnicy = uczestnicyWysciguRepository.findByUzytkownikId(uzytkownik.get(0));
+                if(uczestnicy != null){
+                    if(uczestnicy.size() > 0){
+                        uczestnicyWysciguRepository.deleteByUzytkownikId(uzytkownik.get(0));
+                        return ResponseEntity.ok(uczestnicy);
+                    }else{
+                        return new ResponseEntity(HttpStatus.NO_CONTENT);
+                    }
+                }else{
+                    return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+                }
+            }else{
+                return new ResponseEntity(HttpStatus.NO_CONTENT);
+            }
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    public ResponseEntity<UczestnicyWyscigu> updateUczestnicyWyscigu(UczestnicyWyscigu uczestnicyWyscigu){
+        if(uczestnicyWysciguRepository.exists(new UczestnicyWysciguId(uczestnicyWyscigu.getNr(),uczestnicyWyscigu.getWyscigId().getId()))){
+            uczestnicyWysciguRepository.save(uczestnicyWyscigu);
+            return ResponseEntity.ok(uczestnicyWyscigu);
+        }else{
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
     }
 }

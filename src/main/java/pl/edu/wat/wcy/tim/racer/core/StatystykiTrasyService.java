@@ -49,7 +49,7 @@ public class StatystykiTrasyService {
         }
     }
 
-    public ResponseEntity addStatystykiTrasy(int nrPojazdu, Long uzytkownikId, Long trasaId, Time czas,int vMax,int vAvg,Time czas_0_100,Time czas_0_vmax,int ocena){
+    public ResponseEntity<StatystykiTrasy> addStatystykiTrasy(int nrPojazdu, Long uzytkownikId, Long trasaId, Time czas,int vMax,int vAvg,Time czas_0_100,Time czas_0_vmax,int ocena){
         List<Uzytkownik> uzytkownik = uzytkownikRepository.findById(uzytkownikId);
         if(uzytkownik != null) {
             if(uzytkownik.size() > 0) {
@@ -61,7 +61,7 @@ public class StatystykiTrasyService {
                             if (trasa.size() > 0) {
                                 StatystykiTrasy statystykiTrasy = new StatystykiTrasy(trasa.get(0),pojazdyUzytk.get(0),czas,vMax,vAvg,czas_0_100,czas_0_vmax,ocena);
                                 statystykiTrasyRepository.saveAndFlush(statystykiTrasy);
-                                return new ResponseEntity(HttpStatus.CREATED);
+                                return ResponseEntity.ok(statystykiTrasy);
                             } else {
                                 return new ResponseEntity(HttpStatus.NO_CONTENT);
                             }
@@ -192,7 +192,7 @@ public class StatystykiTrasyService {
         }
     }
 
-    public ResponseEntity deleteStatystykiTrasy(Long trasaId,int nrPojazdu,Long uzytkownikId){
+    public ResponseEntity<StatystykiTrasy> deleteStatystykiTrasy(Long trasaId,int nrPojazdu,Long uzytkownikId){
         List<Uzytkownik> uzytkownik = uzytkownikRepository.findById(uzytkownikId);
         if(uzytkownik != null) {
             if(uzytkownik.size() > 0) {
@@ -202,9 +202,10 @@ public class StatystykiTrasyService {
                         List<Trasa> trasa = trasaRepository.findById(trasaId);
                         if (trasa != null) {
                             if (trasa.size() > 0) {
-                                if (statystykiTrasyRepository.findByTrasaIdAndPojazdyUzytkownikaId(trasa.get(0),pojazdyUzytk.get(0)).size() > 0) {
+                                List<StatystykiTrasy> statystykiTrasy = statystykiTrasyRepository.findByTrasaIdAndPojazdyUzytkownikaId(trasa.get(0),pojazdyUzytk.get(0));
+                                if (statystykiTrasy != null && statystykiTrasy.size() > 0) {
                                     statystykiTrasyRepository.delete(new StatystykiTrasyId(trasa.get(0).getId(),new PojazdyUzytkownikaId(nrPojazdu,uzytkownik.get(0).getId())));
-                                    return new ResponseEntity(HttpStatus.OK);
+                                    return ResponseEntity.ok(statystykiTrasy.get(0));
                                 } else {
                                     return new ResponseEntity(HttpStatus.NO_CONTENT);
                                 }
@@ -228,13 +229,14 @@ public class StatystykiTrasyService {
         }
     }
 
-    public ResponseEntity deleteStatystykiTrasyByTrasaId(Long trasaId){
+    public ResponseEntity<List<StatystykiTrasy>> deleteStatystykiTrasyByTrasaId(Long trasaId){
         List<Trasa> trasa = trasaRepository.findById(trasaId);
         if(trasa != null) {
             if(trasa.size() > 0) {
-                if (statystykiTrasyRepository.findByTrasaId(trasa.get(0)).size() > 0) {
+                List<StatystykiTrasy> statystykiTrasy = statystykiTrasyRepository.findByTrasaId(trasa.get(0));
+                if (statystykiTrasy != null && statystykiTrasy.size() > 0) {
                     statystykiTrasyRepository.deleteByTrasaId(trasa.get(0));
-                    return new ResponseEntity(HttpStatus.OK);
+                    return ResponseEntity.ok(statystykiTrasy);
                 } else {
                     return new ResponseEntity(HttpStatus.NO_CONTENT);
                 }
@@ -243,6 +245,47 @@ public class StatystykiTrasyService {
             }
         }else{
             return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    public ResponseEntity<List<StatystykiTrasy>> deleteStatystykiTrasyByPojazdyUzytkownikaId(int nr,long uzytkownikId){
+        List<Uzytkownik> uzyt = uzytkownikRepository.findById(uzytkownikId);
+        if(uzyt != null){
+            if(uzyt.size() > 0){
+                List<PojazdyUzytkownika> pojazd = pojazdyUzytkownikaRepository.findByNrAndUzytkownikId(nr,uzyt.get(0));
+                if(pojazd != null){
+                    if(pojazd.size() > 0){
+                        List<StatystykiTrasy> stat = statystykiTrasyRepository.findByPojazdyUzytkownikaId(pojazd.get(0));
+                        if(stat != null){
+                            if(stat.size() > 0){
+                                statystykiTrasyRepository.deleteByPojazdyUzytkownikaId(pojazd.get(0));
+                                return ResponseEntity.ok(stat);
+                            }else{
+                                return new ResponseEntity(HttpStatus.NO_CONTENT);
+                            }
+                        }else{
+                            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+                        }
+                    }else{
+                        return new ResponseEntity(HttpStatus.NO_CONTENT);
+                    }
+                }else{
+                    return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+                }
+            }else{
+                return new ResponseEntity(HttpStatus.NO_CONTENT);
+            }
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    public ResponseEntity<StatystykiTrasy> updateStatystykiTrasy(StatystykiTrasy statystykiTrasy){
+        if(statystykiTrasyRepository.exists(new StatystykiTrasyId(statystykiTrasy.getTrasaId().getId(),new PojazdyUzytkownikaId(statystykiTrasy.getPojazdyUzytkownikaId().getNr(),statystykiTrasy.getPojazdyUzytkownikaId().getUzytkownikId().getId())))){
+            statystykiTrasyRepository.save(statystykiTrasy);
+            return ResponseEntity.ok(statystykiTrasy);
+        }else{
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
     }
 }

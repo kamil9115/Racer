@@ -3,10 +3,7 @@ package pl.edu.wat.wcy.tim.racer.api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.edu.wat.wcy.tim.racer.core.UczestnicyWysciguService;
 import pl.edu.wat.wcy.tim.racer.domain.UczestnicyWyscigu;
 
@@ -32,8 +29,8 @@ public class UczestnicyWysciguRestController {
     }
 
     @RequestMapping(value = "/uczestnicy_wyscigu", method = RequestMethod.POST)
-    public ResponseEntity addUczestnicyWyscigu(@RequestParam("uzytkownikId") Long uzytkownikId, @RequestParam("wyscigId") Long wyscigId) {
-        ResponseEntity response = uczestnicyWysciguService.addUczestnicyWyscigu(uzytkownikId,wyscigId);
+    public ResponseEntity<UczestnicyWyscigu> addUczestnicyWyscigu(@RequestParam("uzytkownikId") Long uzytkownikId, @RequestParam("wyscigId") Long wyscigId) {
+        ResponseEntity<UczestnicyWyscigu> response = uczestnicyWysciguService.addUczestnicyWyscigu(uzytkownikId,wyscigId);
         if(response != null){
             return response;
         }else{
@@ -92,8 +89,8 @@ public class UczestnicyWysciguRestController {
     }
 
     @RequestMapping(value = "/uczestnicy_wyscigu", method = RequestMethod.DELETE)
-    public ResponseEntity deleteUczestnicyWyscigu(@RequestParam("nr") int nr,@RequestParam("wyscigId") Long wyscigId) {
-        ResponseEntity response = uczestnicyWysciguService.deleteUczestnicyWyscigu(nr,wyscigId);
+    public ResponseEntity<UczestnicyWyscigu> deleteUczestnicyWyscigu(@RequestParam("nr") int nr,@RequestParam("wyscigId") Long wyscigId) {
+        ResponseEntity<UczestnicyWyscigu> response = uczestnicyWysciguService.deleteUczestnicyWyscigu(nr,wyscigId);
         if(response != null){
             return response;
         }else{
@@ -102,8 +99,18 @@ public class UczestnicyWysciguRestController {
     }
 
     @RequestMapping(value = "/uczestnicy_wyscigu/wyscigId", method = RequestMethod.DELETE)
-    public ResponseEntity deleteUczestnicyWyscigu(@RequestParam("wyscigId") Long wyscigId) {
-        ResponseEntity response = uczestnicyWysciguService.deleteUczestnicyWysciguByWyscigId(wyscigId);
+    public ResponseEntity<UczestnicyWyscigu> deleteUczestnicyWyscigu(@RequestParam("wyscigId") Long wyscigId) {
+        ResponseEntity<UczestnicyWyscigu> response = uczestnicyWysciguService.deleteUczestnicyWysciguByWyscigId(wyscigId);
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    @RequestMapping(value = "/uczestnicy_wyscigu", method = RequestMethod.PUT)
+    public ResponseEntity<UczestnicyWyscigu> updateUczestnicyWyscigu(@RequestBody UczestnicyWyscigu uczestnicyWyscigu){
+        ResponseEntity<UczestnicyWyscigu> response = uczestnicyWysciguService.updateUczestnicyWyscigu(uczestnicyWyscigu);
         if(response != null){
             return response;
         }else{

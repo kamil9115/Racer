@@ -29,8 +29,8 @@ public class PunktyTrasyRestController {
     }
 
     @RequestMapping(value = "/punkty_trasy", method = RequestMethod.POST)
-    public ResponseEntity addPunktyTrasy(@RequestParam("trasaId") Long trasaId, @RequestParam("szer") double szer, @RequestParam("dlug") double dlug) {
-        ResponseEntity response = punktyTrasyService.addPunktyTrasy(trasaId,szer,dlug);
+    public ResponseEntity<PunktyTrasy> addPunktyTrasy(@RequestParam("trasaId") Long trasaId, @RequestParam("szer") double szer, @RequestParam("dlug") double dlug) {
+        ResponseEntity<PunktyTrasy> response = punktyTrasyService.addPunktyTrasy(trasaId,szer,dlug);
         if(response != null){
             return response;
         }else{
@@ -69,8 +69,8 @@ public class PunktyTrasyRestController {
     }
 
     @RequestMapping(value = "/punkty_trasy", method = RequestMethod.DELETE)
-    public ResponseEntity deletePunktyTrasy(@RequestParam("nr") int nr,@RequestParam("trasaId") Long trasaId) {
-        ResponseEntity response = punktyTrasyService.deletePunktyTrasy(nr,trasaId);
+    public ResponseEntity<PunktyTrasy> deletePunktyTrasy(@RequestParam("nr") int nr,@RequestParam("trasaId") Long trasaId) {
+        ResponseEntity<PunktyTrasy> response = punktyTrasyService.deletePunktyTrasy(nr,trasaId);
         if(response != null){
             return response;
         }else{
@@ -79,8 +79,18 @@ public class PunktyTrasyRestController {
     }
 
     @RequestMapping(value = "/punkty_trasy/trasaId", method = RequestMethod.DELETE)
-    public ResponseEntity deletePunktyTrasy(@RequestParam("trasaId") Long trasaId) {
-        ResponseEntity response = punktyTrasyService.deletePunktyTrasyByTrasaId(trasaId);
+    public ResponseEntity<List<PunktyTrasy>> deletePunktyTrasy(@RequestParam("trasaId") Long trasaId) {
+        ResponseEntity<List<PunktyTrasy>> response = punktyTrasyService.deletePunktyTrasyByTrasaId(trasaId);
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    @RequestMapping(value = "/punkty_trasy", method = RequestMethod.PUT)
+    public ResponseEntity<PunktyTrasy> updatePunktyTrasy(@RequestBody PunktyTrasy punktyTrasy){
+        ResponseEntity<PunktyTrasy> response = punktyTrasyService.updatePunktyTrasy(punktyTrasy);
         if(response != null){
             return response;
         }else{

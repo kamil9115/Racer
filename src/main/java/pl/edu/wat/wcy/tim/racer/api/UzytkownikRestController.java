@@ -33,8 +33,8 @@ public class UzytkownikRestController {
     }
 
     @RequestMapping(value = "/uzytkownik", method = RequestMethod.POST)
-    public ResponseEntity addUzytkownik(@RequestParam("nazwa") String nazwa, @RequestParam("haslo") String haslo) {
-        ResponseEntity response = uzytkownikService.addUzytkownik(nazwa,haslo);
+    public ResponseEntity<Uzytkownik> addUzytkownik(@RequestParam("nazwa") String nazwa, @RequestParam("haslo") String haslo) {
+        ResponseEntity<Uzytkownik> response = uzytkownikService.addUzytkownik(nazwa,haslo);
         if(response != null){
             return response;
         }else{
@@ -83,8 +83,18 @@ public class UzytkownikRestController {
     }
 
     @RequestMapping(value = "/uzytkownik", method = RequestMethod.DELETE)
-    public ResponseEntity deleteUzytkownik(@RequestParam("id") Long id) {
-        ResponseEntity response = uzytkownikService.deleteUzytkownik(id);
+    public ResponseEntity<Uzytkownik> deleteUzytkownik(@RequestParam("id") Long id) {
+        ResponseEntity<Uzytkownik> response = uzytkownikService.deleteUzytkownik(id);
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    @RequestMapping(value = "/uzytkownik", method = RequestMethod.PUT)
+    public ResponseEntity<Uzytkownik> updateUzytkownik(@RequestBody Uzytkownik uzytkownik){
+        ResponseEntity<Uzytkownik> response = uzytkownikService.updateUzytkownik(uzytkownik);
         if(response != null){
             return response;
         }else{

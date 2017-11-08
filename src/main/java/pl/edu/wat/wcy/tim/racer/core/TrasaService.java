@@ -17,12 +17,16 @@ import java.util.List;
 public class TrasaService {
     private TrasaRepository trasaRepository;
     private UzytkownikRepository uzytkownikRepository;
+    private WyscigService wyscigService;
+    private PunktyTrasyService punktyTrasyService;
 
 
     @Autowired
-    public TrasaService(TrasaRepository trasaRepository,UzytkownikRepository uzytkownikRepository){
+    public TrasaService(TrasaRepository trasaRepository,UzytkownikRepository uzytkownikRepository,WyscigService wyscigService,PunktyTrasyService punktyTrasyService){
         this.trasaRepository = trasaRepository;
         this.uzytkownikRepository = uzytkownikRepository;
+        this.wyscigService = wyscigService;
+        this.punktyTrasyService = punktyTrasyService;
     }
 
     public ResponseEntity<List<Trasa>> getTrasa(){
@@ -39,14 +43,14 @@ public class TrasaService {
         }
     }
 
-    public ResponseEntity addTrasa(Long uzytkownikId,String nazwa,String opis){
+    public ResponseEntity<Trasa> addTrasa(Long uzytkownikId,String nazwa,String opis){
         List<Uzytkownik> uzytkownik = uzytkownikRepository.findById(uzytkownikId);
 
         if(uzytkownik != null) {
             if(uzytkownik.size() > 0) {
                 Trasa trasa = new Trasa(uzytkownik.get(0), nazwa, opis);
                 trasaRepository.saveAndFlush(trasa);
-                return new ResponseEntity(HttpStatus.CREATED);
+                return ResponseEntity.ok(trasa);
             }else{
                 return new ResponseEntity(HttpStatus.NO_CONTENT);
             }
@@ -134,10 +138,26 @@ public class TrasaService {
         }
     }
 
-    public ResponseEntity deleteTrasa(Long id){
-        if(trasaRepository.exists(id)){
-            trasaRepository.delete(id);
-            return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity<Trasa> deleteTrasa(Long id){
+        List<Trasa> trasa = trasaRepository.findById(id);
+        if(trasa != null){
+            if(trasa.size() > 0) {
+                wyscigService.deleteWyscigByTrasaId(id);
+                punktyTrasyService.deletePunktyTrasyByTrasaId(id);
+                trasaRepository.delete(id);
+                return ResponseEntity.ok(trasa.get(0));
+            }else{
+                return new ResponseEntity(HttpStatus.NO_CONTENT);
+            }
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    public ResponseEntity<Trasa> updateTrasa(Trasa trasa){
+        if(trasaRepository.exists(trasa.getId())){
+            trasaRepository.save(trasa);
+            return ResponseEntity.ok(trasa);
         }else{
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }

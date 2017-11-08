@@ -3,10 +3,7 @@ package pl.edu.wat.wcy.tim.racer.api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.edu.wat.wcy.tim.racer.core.PojazdyUzytkownikaService;
 import pl.edu.wat.wcy.tim.racer.domain.PojazdyUzytkownika;
 
@@ -32,8 +29,8 @@ public class PojazdyUzytkownikaRestController {
     }
 
     @RequestMapping(value = "/pojazdy_uzytkownika", method = RequestMethod.POST)
-    public ResponseEntity addPojazdyUzytkownika(@RequestParam("uzytkownikId") Long uzytkownikId, @RequestParam("pojazdId") Long pojazdId, @RequestParam("nazwa") String nazwa,String opis) {
-        ResponseEntity response = pojazdyUzytkownikaService.addPojazdyUzytkownika(uzytkownikId,pojazdId,nazwa,opis);
+    public ResponseEntity<PojazdyUzytkownika> addPojazdyUzytkownika(@RequestParam("uzytkownikId") Long uzytkownikId, @RequestParam("pojazdId") Long pojazdId, @RequestParam("nazwa") String nazwa,String opis) {
+        ResponseEntity<PojazdyUzytkownika> response = pojazdyUzytkownikaService.addPojazdyUzytkownika(uzytkownikId,pojazdId,nazwa,opis);
         if(response != null){
             return response;
         }else{
@@ -61,6 +58,16 @@ public class PojazdyUzytkownikaRestController {
         }
     }
 
+    @RequestMapping(value = "/pojazdy_uzytkownika/pojazdId", method = RequestMethod.GET)
+    public ResponseEntity<List<PojazdyUzytkownika>> getPojazdyUzytkownikaByPojazdId(@RequestParam("pojazdId") Long pojazdId) {
+        ResponseEntity<List<PojazdyUzytkownika>> response = pojazdyUzytkownikaService.getPojazdyUzytkownikaByPojazdId(pojazdId);
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
     @RequestMapping(value = "/pojazdy_uzytkownika/nazwa", method = RequestMethod.GET)
     public ResponseEntity<List<PojazdyUzytkownika>> getPojazdyUzytkownikaByNazwa(@RequestParam("nazwa") String nazwa) {
         ResponseEntity<List<PojazdyUzytkownika>> response = pojazdyUzytkownikaService.getPojazdyUzytkownikaByNazwa(nazwa);
@@ -72,8 +79,8 @@ public class PojazdyUzytkownikaRestController {
     }
 
     @RequestMapping(value = "/pojazdy_uzytkownika", method = RequestMethod.DELETE)
-    public ResponseEntity deletePojazdyUzytkownika(@RequestParam("nr") int nr,@RequestParam("uzytkownikId") Long uzytkownikId) {
-        ResponseEntity response = pojazdyUzytkownikaService.deletePojazdyUzytkownika(nr,uzytkownikId);
+    public ResponseEntity<PojazdyUzytkownika> deletePojazdyUzytkownika(@RequestParam("nr") int nr,@RequestParam("uzytkownikId") Long uzytkownikId) {
+        ResponseEntity<PojazdyUzytkownika> response = pojazdyUzytkownikaService.deletePojazdyUzytkownika(nr,uzytkownikId);
         if(response != null){
             return response;
         }else{
@@ -82,8 +89,28 @@ public class PojazdyUzytkownikaRestController {
     }
 
     @RequestMapping(value = "/pojazdy_uzytkownika/uzytkownikId", method = RequestMethod.DELETE)
-    public ResponseEntity deletePojazdyUzytkownika(@RequestParam("uzytkownikId") Long uzytkownikId) {
-        ResponseEntity response = pojazdyUzytkownikaService.deletePojazdyUzytkownikaByUzytkownikId(uzytkownikId);
+    public ResponseEntity<List<PojazdyUzytkownika>> deletePojazdyUzytkownikaByUzytkownikId(@RequestParam("uzytkownikId") Long uzytkownikId) {
+        ResponseEntity<List<PojazdyUzytkownika>> response = pojazdyUzytkownikaService.deletePojazdyUzytkownikaByUzytkownikId(uzytkownikId);
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    @RequestMapping(value = "/pojazdy_uzytkownika/pojazdId", method = RequestMethod.DELETE)
+    public ResponseEntity<List<PojazdyUzytkownika>> deletePojazdyUzytkownikaByPojazdId(@RequestParam("pojazdId") Long pojazdId) {
+        ResponseEntity<List<PojazdyUzytkownika>> response = pojazdyUzytkownikaService.deletePojazdyUzytkownikaByPojazdId(pojazdId);
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    @RequestMapping(value = "/pojazdy_uzytkownika", method = RequestMethod.PUT)
+    public ResponseEntity<PojazdyUzytkownika> updatePojazdyUzytkownika(@RequestBody PojazdyUzytkownika pojazdyUzytkownika){
+        ResponseEntity<PojazdyUzytkownika> response = pojazdyUzytkownikaService.updatePojazdyUzytkownika(pojazdyUzytkownika);
         if(response != null){
             return response;
         }else{

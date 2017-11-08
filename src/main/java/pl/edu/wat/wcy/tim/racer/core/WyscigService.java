@@ -21,12 +21,14 @@ public class WyscigService {
     private WyscigRepository wyscigRepository;
     private TrasaRepository trasaRepository;
     private UzytkownikRepository uzytkownikRepository;
+    private UczestnicyWysciguService uczestnicyWysciguService;
 
     @Autowired
-    public WyscigService(WyscigRepository wyscigRepository,TrasaRepository trasaRepository,UzytkownikRepository uzytkownikRepository){
+    public WyscigService(WyscigRepository wyscigRepository,TrasaRepository trasaRepository,UzytkownikRepository uzytkownikRepository, UczestnicyWysciguService uczestnicyWysciguService){
         this.wyscigRepository = wyscigRepository;
         this.trasaRepository = trasaRepository;
         this.uzytkownikRepository = uzytkownikRepository;
+        this.uczestnicyWysciguService = uczestnicyWysciguService;
     }
 
     public ResponseEntity<List<Wyscig>> getWyscig(){
@@ -43,14 +45,14 @@ public class WyscigService {
         }
     }
 
-    public ResponseEntity addWyscig(Long uzytkownikId, Long trasaId, String nazwa, String opis, String typ, Date data){
+    public ResponseEntity<Wyscig> addWyscig(Long uzytkownikId, Long trasaId, String nazwa, String opis, String typ, Date data){
         List<Uzytkownik> uzytkownik = uzytkownikRepository.findById(uzytkownikId);
         List<Trasa> trasa = trasaRepository.findById(trasaId);
         if(uzytkownik != null && trasa != null) {
             if(uzytkownik.size() > 0 && trasa.size() > 0) {
                 Wyscig wyscig = new Wyscig(uzytkownik.get(0),trasa.get(0), nazwa, opis, typ, data);
                 wyscigRepository.saveAndFlush(wyscig);
-                return new ResponseEntity(HttpStatus.CREATED);
+                return ResponseEntity.ok(wyscig);
             }else{
                 return new ResponseEntity(HttpStatus.NO_CONTENT);
             }
@@ -175,10 +177,51 @@ public class WyscigService {
         }
     }
 
-    public ResponseEntity deleteWyscig(Long id){
-        if(wyscigRepository.exists(id)){
-            wyscigRepository.delete(id);
-            return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity<Wyscig> deleteWyscig(Long id){
+        List<Wyscig> wyscig = wyscigRepository.findById(id);
+        if(wyscig != null ){
+            if(wyscig.size() > 0) {
+                uczestnicyWysciguService.deleteUczestnicyWysciguByWyscigId(id);
+                wyscigRepository.delete(id);
+                return ResponseEntity.ok(wyscig.get(0));
+            }else{
+                return new ResponseEntity(HttpStatus.NO_CONTENT);
+            }
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    public ResponseEntity<List<Wyscig>> deleteWyscigByTrasaId(Long trasaId){
+        List<Trasa> trasa = trasaRepository.findById(trasaId);
+        if (trasa != null) {
+            if(trasa.size() > 0){
+                List<Wyscig> wyscig = wyscigRepository.findByTrasaId(trasa.get(0));
+                if(wyscig != null){
+                    if(wyscig.size() > 0){
+                        for(int i=0;i<wyscig.size();i++){
+                            uczestnicyWysciguService.deleteUczestnicyWysciguByWyscigId(wyscig.get(i).getId());
+                        }
+                        wyscigRepository.deleteByTrasaId(trasa.get(0));
+                        return ResponseEntity.ok(wyscig);
+                    }else{
+                        return new ResponseEntity(HttpStatus.NO_CONTENT);
+                    }
+                }else{
+                    return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+                }
+            }else{
+                return new ResponseEntity(HttpStatus.NO_CONTENT);
+            }
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    public ResponseEntity<Wyscig> updateWyscig(Wyscig wyscig){
+        if(wyscigRepository.exists(wyscig.getId())){
+            wyscigRepository.save(wyscig);
+            return ResponseEntity.ok(wyscig);
         }else{
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }

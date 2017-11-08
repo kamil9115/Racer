@@ -3,10 +3,7 @@ package pl.edu.wat.wcy.tim.racer.api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.edu.wat.wcy.tim.racer.core.WyscigService;
 import pl.edu.wat.wcy.tim.racer.domain.Wyscig;
 
@@ -33,8 +30,8 @@ public class WyscigRestController {
     }
 
     @RequestMapping(value = "/wyscig", method = RequestMethod.POST)
-    public ResponseEntity addWyscig(@RequestParam("uzytkownikId") Long uzytkownikId, @RequestParam("trasaId") Long trasaId, @RequestParam("nazwa") String nazwa, @RequestParam("opis") String opis, @RequestParam("typ") String typ, @RequestParam("data") Date data) {
-        ResponseEntity response = wyscigService.addWyscig(uzytkownikId,trasaId,nazwa,opis,typ,data);
+    public ResponseEntity<Wyscig> addWyscig(@RequestParam("uzytkownikId") Long uzytkownikId, @RequestParam("trasaId") Long trasaId, @RequestParam("nazwa") String nazwa, @RequestParam("opis") String opis, @RequestParam("typ") String typ, @RequestParam("data") Date data) {
+        ResponseEntity<Wyscig> response = wyscigService.addWyscig(uzytkownikId,trasaId,nazwa,opis,typ,data);
         if(response != null){
             return response;
         }else{
@@ -113,8 +110,28 @@ public class WyscigRestController {
     }
 
     @RequestMapping(value = "/wyscig", method = RequestMethod.DELETE)
-    public ResponseEntity deleteTrasa(@RequestParam("id") Long id) {
-        ResponseEntity response = wyscigService.deleteWyscig(id);
+    public ResponseEntity<Wyscig> deleteTrasa(@RequestParam("id") Long id) {
+        ResponseEntity<Wyscig> response = wyscigService.deleteWyscig(id);
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    @RequestMapping(value = "/wyscig/trasaId", method = RequestMethod.DELETE)
+    public ResponseEntity<List<Wyscig>> deleteTrasaByTrasaId(@RequestParam("trasaId") Long trasaId) {
+        ResponseEntity<List<Wyscig>> response = wyscigService.deleteWyscigByTrasaId(trasaId);
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    @RequestMapping(value = "/wyscig", method = RequestMethod.PUT)
+    public ResponseEntity<Wyscig> updateWyscig(@RequestBody Wyscig wyscig){
+        ResponseEntity<Wyscig> response = wyscigService.updateWyscig(wyscig);
         if(response != null){
             return response;
         }else{

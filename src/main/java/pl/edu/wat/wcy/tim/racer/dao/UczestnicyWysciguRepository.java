@@ -22,4 +22,7 @@ public interface UczestnicyWysciguRepository extends JpaRepository<UczestnicyWys
     @Modifying
     @Transactional
     void deleteByWyscigId(Wyscig wyscigId);
+    @Modifying
+    @Transactional
+    void deleteByUzytkownikId(Uzytkownik uzytkownikId);
 }
