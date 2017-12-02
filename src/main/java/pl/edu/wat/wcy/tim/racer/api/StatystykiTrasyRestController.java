@@ -118,4 +118,24 @@ public class StatystykiTrasyRestController {
             return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
         }
     }
+
+    @RequestMapping(value = "/statystyki_trasy/uzytkownikId", method = RequestMethod.GET)
+    public ResponseEntity<List<StatystykiTrasy>> getStatystykiTrasyByUzytkownikId(@RequestParam("uzytkownikId") Long uzytkownikId) {
+        ResponseEntity<List<StatystykiTrasy>> response = statystykiTrasyService.getStatystykiTrasyByUzytkownikId(uzytkownikId);
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    @RequestMapping(value = "/statystyki_trasy/setOcenaAvg", method = RequestMethod.PUT)
+    public ResponseEntity<Float> setOcenaAvg(@RequestParam("trasaId") Long trasaId, @RequestParam("uzytkownikId") Long uzytkownikId,@RequestParam("ocena") int ocena) {
+        ResponseEntity<Float> response = statystykiTrasyService.setOcenaAvg(trasaId,uzytkownikId,ocena);
+        if(response != null){
+            return response;
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
 }

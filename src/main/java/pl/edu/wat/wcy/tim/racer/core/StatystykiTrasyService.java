@@ -288,4 +288,57 @@ public class StatystykiTrasyService {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
     }
+
+    public ResponseEntity<List<StatystykiTrasy>> getStatystykiTrasyByUzytkownikId(long uzytkownikId){
+        List<Uzytkownik> uzytkownik = uzytkownikRepository.findById(uzytkownikId);
+        if(uzytkownik != null){
+            if(uzytkownik.size() > 0){
+                List<StatystykiTrasy> statystyki = statystykiTrasyRepository.findByPojazdyUzytkownikaId_UzytkownikId(uzytkownik.get(0));
+                if(statystyki != null){
+                    if(statystyki.size() > 0){
+                        return ResponseEntity.ok(statystyki);
+                    }else{
+                        return new ResponseEntity(HttpStatus.NO_CONTENT);
+                    }
+                }else{
+                    return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+                }
+            }else{
+                return new ResponseEntity(HttpStatus.NO_CONTENT);
+            }
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
+
+    public ResponseEntity<Float> setOcenaAvg(long trasaId,long uzytkownikId,int ocena){
+        List<Uzytkownik> uzytkownik = uzytkownikRepository.findById(uzytkownikId);
+        if(uzytkownik != null){
+            if(uzytkownik.size() > 0){
+                List<Trasa> trasa = trasaRepository.findById(trasaId);
+                if(trasa != null) {
+                    if(trasa.size() > 0) {
+                        statystykiTrasyRepository.updateOcenaByUzytkownikId(trasa.get(0),uzytkownik.get(0),ocena);
+                        Float avg = statystykiTrasyRepository.findOcenaAvgByTrasaId(trasa.get(0));
+                        if(avg != null){
+                            Trasa tras = trasa.get(0);
+                            tras.setOcenaAvg(avg);
+                            trasaRepository.save(tras);
+                            return ResponseEntity.ok(avg);
+                        }else{
+                            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+                        }
+                    }else{
+                        return new ResponseEntity(HttpStatus.NO_CONTENT);
+                    }
+                }else{
+                    return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+                }
+            }else{
+                return new ResponseEntity(HttpStatus.NO_CONTENT);
+            }
+        }else{
+            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
+        }
+    }
 }
