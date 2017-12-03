@@ -39,7 +39,7 @@ public class PunktyTrasyRestController {
     }
 
     @RequestMapping(value = "/punkty_trasy/all", method = RequestMethod.POST)
-    public ResponseEntity addPunktyTrasyAll(@RequestBody List<PunktyTrasy> punkty) {
+    public ResponseEntity<List<PunktyTrasy>> addPunktyTrasyAll(@RequestBody List<PunktyTrasy> punkty) {
         ResponseEntity response = punktyTrasyService.addPunktyTrasy(punkty);
         if(response != null){
             return response;

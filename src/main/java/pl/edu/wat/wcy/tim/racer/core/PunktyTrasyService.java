@@ -72,9 +72,9 @@ public class PunktyTrasyService {
         }
     }
 
-    public ResponseEntity addPunktyTrasy(List<PunktyTrasy> punkty){
+    public ResponseEntity<List<PunktyTrasy>> addPunktyTrasy(List<PunktyTrasy> punkty){
         punktyTrasyRepository.save(punkty);
-        return new ResponseEntity(HttpStatus.CREATED);
+        return ResponseEntity.ok(punkty);
     }
 
     public ResponseEntity<List<PunktyTrasy>> getPunktyTrasyById(int nr,Long trasaId){
