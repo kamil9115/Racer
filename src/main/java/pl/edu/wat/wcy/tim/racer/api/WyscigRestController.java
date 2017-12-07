@@ -30,7 +30,7 @@ public class WyscigRestController {
     }
 
     @RequestMapping(value = "/wyscig", method = RequestMethod.POST)
-    public ResponseEntity<Wyscig> addWyscig(@RequestParam("uzytkownikId") Long uzytkownikId, @RequestParam("trasaId") Long trasaId, @RequestParam("nazwa") String nazwa, @RequestParam("opis") String opis, @RequestParam("typ") String typ, @RequestParam("data") Date data) {
+    public ResponseEntity<Wyscig> addWyscig(@RequestParam("uzytkownikId") Long uzytkownikId, @RequestParam("trasaId") Long trasaId, @RequestParam("nazwa") String nazwa, @RequestParam("opis") String opis, @RequestParam("typ") String typ, @RequestParam("data") Long data) {
         ResponseEntity<Wyscig> response = wyscigService.addWyscig(uzytkownikId,trasaId,nazwa,opis,typ,data);
         if(response != null){
             return response;

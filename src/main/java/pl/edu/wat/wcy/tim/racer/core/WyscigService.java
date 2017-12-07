@@ -45,12 +45,13 @@ public class WyscigService {
         }
     }
 
-    public ResponseEntity<Wyscig> addWyscig(Long uzytkownikId, Long trasaId, String nazwa, String opis, String typ, Date data){
+    public ResponseEntity<Wyscig> addWyscig(Long uzytkownikId, Long trasaId, String nazwa, String opis, String typ, Long data){
         List<Uzytkownik> uzytkownik = uzytkownikRepository.findById(uzytkownikId);
         List<Trasa> trasa = trasaRepository.findById(trasaId);
         if(uzytkownik != null && trasa != null) {
             if(uzytkownik.size() > 0 && trasa.size() > 0) {
-                Wyscig wyscig = new Wyscig(uzytkownik.get(0),trasa.get(0), nazwa, opis, typ, data);
+                Date dat = new Date(data);
+                Wyscig wyscig = new Wyscig(uzytkownik.get(0),trasa.get(0), nazwa, opis, typ, dat);
                 wyscigRepository.saveAndFlush(wyscig);
                 return ResponseEntity.ok(wyscig);
             }else{
