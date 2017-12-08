@@ -29,8 +29,8 @@ public class UczestnicyWysciguRestController {
     }
 
     @RequestMapping(value = "/uczestnicy_wyscigu", method = RequestMethod.POST)
-    public ResponseEntity<UczestnicyWyscigu> addUczestnicyWyscigu(@RequestParam("uzytkownikId") Long uzytkownikId, @RequestParam("wyscigId") Long wyscigId) {
-        ResponseEntity<UczestnicyWyscigu> response = uczestnicyWysciguService.addUczestnicyWyscigu(uzytkownikId,wyscigId);
+    public ResponseEntity<UczestnicyWyscigu> addUczestnicyWyscigu(@RequestParam("nr") int nr,@RequestParam("uzytkownikId") Long uzytkownikId, @RequestParam("wyscigId") Long wyscigId) {
+        ResponseEntity<UczestnicyWyscigu> response = uczestnicyWysciguService.addUczestnicyWyscigu(nr,uzytkownikId,wyscigId);
         if(response != null){
             return response;
         }else{

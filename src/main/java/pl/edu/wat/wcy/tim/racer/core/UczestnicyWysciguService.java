@@ -43,31 +43,16 @@ public class UczestnicyWysciguService {
         }
     }
 
-    public ResponseEntity<UczestnicyWyscigu> addUczestnicyWyscigu(Long uzytkownikId,Long wyscigId){
+    public ResponseEntity<UczestnicyWyscigu> addUczestnicyWyscigu(int nr,Long uzytkownikId,Long wyscigId){
         List<Uzytkownik> uzytkownik = uzytkownikRepository.findById(uzytkownikId);
         if(uzytkownik != null) {
             if(uzytkownik.size() > 0) {
                 List<Wyscig> wyscig = wyscigRepository.findById(wyscigId);
                 if(wyscig != null){
                     if(wyscig.size() > 0){
-                        int nr = 0;
-                        List<UczestnicyWyscigu> uczestnicy = uczestnicyWysciguRepository.findByWyscigId(wyscig.get(0));
-                        if(uczestnicy != null) {
-                            if (uczestnicy.size() > 0) {
-                                nr = uczestnicy.get(0).getNr();
-                                for (int i = 1; i < uczestnicy.size(); i++) {
-                                    if (nr < uczestnicy.get(i).getNr()) {
-                                        nr = uczestnicy.get(i).getNr();
-                                    }
-                                }
-                                nr++;
-                            }
-                            UczestnicyWyscigu uczestnicyWyscigu = new UczestnicyWyscigu(nr,wyscig.get(0),uzytkownik.get(0),false,0);
-                            uczestnicyWysciguRepository.saveAndFlush(uczestnicyWyscigu);
-                            return ResponseEntity.ok(uczestnicyWyscigu);
-                        }else{
-                            return new ResponseEntity(HttpStatus.EXPECTATION_FAILED);
-                        }
+                        UczestnicyWyscigu uczestnicyWyscigu = new UczestnicyWyscigu(nr,wyscig.get(0),uzytkownik.get(0),false,0);
+                        uczestnicyWysciguRepository.saveAndFlush(uczestnicyWyscigu);
+                        return ResponseEntity.ok(uczestnicyWyscigu);
                     }else{
                         return new ResponseEntity(HttpStatus.NO_CONTENT);
                     }
