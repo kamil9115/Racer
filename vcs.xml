@@ -6,8 +6,12 @@
           <option name="url" value="https://github.com/kamil9115/Racer.git" />
           <option name="userName" value="" />
         </UrlAndUserName>
+        <UrlAndUserName>
+          <option name="url" value="https://github.com/marsmiaro/IoOOM-WAT" />
+          <option name="userName" value="" />
+        </UrlAndUserName>
       </list>
     </option>
-    <option name="cloneParentDir" value="C:\Users\Kamil\Desktop\Racer" />
+    <option name="cloneParentDir" value="C:\Users\Kamil\Desktop\RUP_WMO" />
   </component>
 </application>
