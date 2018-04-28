@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Racer</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.5/angular.min.js"></script>
+    <script src="js/controller.js"></script>
+
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div ng-app="app">
+<div ng-controller="controller">
+    <form>
+        <label>nazwa:</label>
+        <input type="text" name="name" ng-model="newUzytkownik.nazwa">
+        <label>hasło:</label>
+        <input type="text" name="password" ng-model="newUzytkownik.haslo">
+
+        <input type="button" value="Dodaj" ng-click="addUzytkownik()">
+    </form>
+
+    <form>
+        <label>nazwa:</label>
+        <input type="text" name="name" ng-model="findUzytkownik.nazwa">
+        <label>id:</label>
+        <input type="text" name="id" ng-model="findUzytkownik.id">
+
+        <input type="button" value="Szukaj Nazwa" ng-click="getUzytkownikByNazwa()">
+        <input type="button" value="Szukaj Id" ng-click="getUzytkownikById()">
+    </form>
+
+    <h2>Użytkownicy:</h2>
+    <table class="table table-striped">
+        <thead>
+        <th>id:</th>
+        <th>nazwa:</th>
+        <th>hasło:</th>
+        <th>administrator:</th>
+        </thead>
+        <tr ng-repeat="uzytkownik in uzytkownikList">
+            <td>{{uzytkownik.id}}</td>
+            <td>{{uzytkownik.nazwa}}</td>
+            <td>{{uzytkownik.haslo}}</td>
+            <td>{{uzytkownik.administrator}}</td>
+            <td>
+                <a class="btn btn-danger" ng-click="deleteUzytkownik(uzytkownik.id)">
+                    <span class="icon-trash icon-white"></span>
+                    Usuń
+                </a>
+            </td>
+        </tr>
+    </table>
+</div>
+</div>
+</body>
+</html>
